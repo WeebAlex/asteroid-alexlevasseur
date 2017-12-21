@@ -2,6 +2,7 @@ package ca.bart.myapplication;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
@@ -12,7 +13,12 @@ import android.view.MotionEvent;
 public class Earth implements GameObject
 {
     private Paint blueOutline = new Paint();
-    public int earthHP = 100;
+
+    private int touchId = -1;
+    private double angle;
+
+    Matrix matrix = new Matrix();
+    float[] points = new float[2];
 
     public Earth() {
         blueOutline.setColor(Color.BLUE);

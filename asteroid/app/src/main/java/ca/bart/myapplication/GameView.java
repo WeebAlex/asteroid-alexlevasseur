@@ -19,20 +19,11 @@ public class GameView extends View implements Constants{
     private LinkedList<GameObject> gameObjects = new LinkedList<>();
 
     private int cx, cy;
-    private int earthOffset = 15;
-    private int asteroidWidth =  5;
-
     private float scale;
+    private float spawnInterval = 0.5f;
     private float timeUntilSpawn = 0.0f;
-
-    private double[] lasersTimers = new double[100];
-    private double laserLingerTime = 0.3f;
-
     private Asteroid[] asteroids = new Asteroid[100];
-    private Laser[] lasers = new Laser[100];
-
-    private Earth earth = new Earth();
-    private Ship ship = new Ship();
+    private int asteroidIndex = 0;
 
     public GameView(Context context) {
         this(context, null);
@@ -41,18 +32,14 @@ public class GameView extends View implements Constants{
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
+        gameObjects.add(new Ship());
+        gameObjects.add(new Earth());
+
         for(int i = 0; i < asteroids.length; i++)
         {
-            asteroids[i] = null;
+            asteroids[i] = new Asteroid();
+            gameObjects.add(asteroids[i]);
         }
-
-        for(int i = 0; i < lasers.length; i++)
-        {
-            lasers[i] = null;
-        }
-
-        gameObjects.add(ship);
-        gameObjects.add(earth);
     }
 
     @Override
@@ -70,6 +57,17 @@ public class GameView extends View implements Constants{
         canvas.translate(cx, cy);
         canvas.scale(scale, -scale);
 
+        /*
+        Paint blueOutline = new Paint();
+        blueOutline.setColor(Color.BLUE);
+        blueOutline.setStyle(Paint.Style.STROKE);
+        blueOutline.setStrokeWidth(2);
+
+
+        Helper.drawPolygon(canvas, blueOutline, 100, 4);
+        Helper.drawPolygon(canvas, blueOutline, 100, 6);
+        */
+
         for (GameObject gameObject : gameObjects) {
             gameObject.onDraw(canvas);
         }
@@ -82,101 +80,16 @@ public class GameView extends View implements Constants{
         }
 
         AsteroidSpawner();
-        LaserSpawner();
-        CheckForEarth();
-        CheckForAsteroid();
-        LaserTimer();
     }
 
     public void AsteroidSpawner()
     {
-        float spawnInterval = 0.5f;
         timeUntilSpawn += DELTA_TIME;
 
         if(timeUntilSpawn >= spawnInterval)
         {
             timeUntilSpawn = 0.0f;
-            for(int i = 0; i < asteroids.length; i++)
-            {
-                if(asteroids[i] == null)
-                {
-                    asteroids[i] = new Asteroid();
-                    gameObjects.add(asteroids[i]);
-                    break;
-                }
-            }
-        }
-    }
-
-    public void LaserSpawner()
-    {
-        if(ship.fireLaser)
-        {
-            for(int i = 0; i < lasers.length; i++)
-            {
-                if(lasers[i] == null)
-                {
-                    lasers[i] = new Laser(ship.fireLaser, ship.angle, ship.matrix);
-                    gameObjects.add(lasers[i]);
-                    ship.fireLaser = false;
-                    break;
-                }
-            }
-        }
-    }
-
-    private void LaserTimer()
-    {
-        for(int i = 0; i < lasers.length; i++)
-        {
-            if(lasers[i] != null)
-            {
-                lasersTimers[i] += DELTA_TIME;
-                if (lasersTimers[i] >= laserLingerTime)
-                {
-                    gameObjects.remove(lasers[i]);
-                    lasers[i] = null;
-                    lasersTimers[i] = 0.0f;
-                }
-            }
-        }
-    }
-
-    private void CheckForEarth()
-    {
-        for(int i = 0; i < asteroids.length; i++)
-        {
-            if(asteroids[i] != null)
-            {
-                if(asteroids[i].targetDistance >= asteroids[i].asteroidSpawnY - earthOffset)
-                {
-                    earth.earthHP -= 10;
-                    gameObjects.remove(asteroids[i]);
-                    asteroids[i] = null;
-                }
-            }
-        }
-    }
-
-    private void CheckForAsteroid()
-    {
-        for(int i = 0; i < lasers.length; i++)
-        {
-            if(lasers[i] != null)
-            {
-                for(int j = 0; j < asteroids.length; j++)
-                {
-                    if(asteroids[j] != null)
-                    {
-                        if(lasers[i].angle <= asteroids[j].asteroidSpawn - 270 + asteroidWidth && lasers[i].angle >= asteroids[j].asteroidSpawn - 270 - asteroidWidth
-                        || lasers[i].angle <= asteroids[j].asteroidSpawn + 90 + asteroidWidth && lasers[i].angle >= asteroids[j].asteroidSpawn + 90 - asteroidWidth)
-                        {
-                            gameObjects.remove(asteroids[j]);
-                            asteroids[j] = null;
-                        }
-                    }
-                }
-            }
+            asteroids[asteroidIndex++] = new Asteroid();
         }
     }
 
