@@ -10,15 +10,12 @@ import android.view.MotionEvent;
  * Created by 1630099 on 2017-10-31.
  */
 
-public class Ship implements GameObject, Constants {
+public class Ship implements GameObject {
 
     private Paint blueOutline = new Paint();
 
-
     private int touchId = -1;
-    public double angle;
-
-    public boolean fireLaser = false;
+    private double angle;
 
     Matrix matrix = new Matrix();
     float[] points = new float[2];
@@ -27,10 +24,6 @@ public class Ship implements GameObject, Constants {
         blueOutline.setColor(Color.BLUE);
         blueOutline.setStyle(Paint.Style.STROKE);
         blueOutline.setStrokeWidth(1);
-
-        //redOutline.setColor(Color.RED);
-        //redOutline.setStyle(Paint.Style.STROKE);
-        //redOutline.setStrokeWidth(2);
     }
 
     public void onDraw(Canvas canvas) {
@@ -43,9 +36,10 @@ public class Ship implements GameObject, Constants {
     }
 
     public void update() {
+
     }
 
-    private void AddShip(Canvas canvas)
+    public void AddShip(Canvas canvas)
     {
         canvas.getMatrix().invert(matrix);
 
@@ -58,13 +52,6 @@ public class Ship implements GameObject, Constants {
         canvas.rotate(45);
 
         Helper.drawTriangle(canvas,blueOutline, 8, 45, true);
-    }
-
-    private int getIndex(MotionEvent event)
-    {
-        int idx = (event.getAction() & MotionEvent.ACTION_POINTER_INDEX_MASK) & MotionEvent.ACTION_POINTER_INDEX_SHIFT;
-
-        return idx;
     }
 
     public boolean onTouchEvent(MotionEvent event) {
@@ -83,37 +70,19 @@ public class Ship implements GameObject, Constants {
 
             case MotionEvent.ACTION_MOVE:
 
-                int touchCounter = event.getPointerCount();
-                for(int t = 0; t < touchCounter; t++)
-                {
-                    int currentId = event.getPointerId(t);
-                    if (touchId == id || currentId == touchId) {
+                if (touchId == id) {
 
-                        points[0] = event.getX(index);
-                        points[1] = event.getY(index);
-                        matrix.mapPoints(points);
+                    points[0] = event.getX(index);
+                    points[1] = event.getY(index);
+                    matrix.mapPoints(points);
 
-                        angle = Math.toDegrees(Math.atan2(points[1], points[0]));
-                        return true;
-                    }
+                    angle = Math.toDegrees(Math.atan2(points[1], points[0]));
+                    return true;
                 }
                 break;
 
             case MotionEvent.ACTION_POINTER_UP:
-
-                int currentId = event.getPointerId(getIndex(event));
-                if (currentId == touchId)
-                {
-                    fireLaser = true;
-                }
-
             case MotionEvent.ACTION_UP:
-
-                if (touchId == id)
-                {
-                    fireLaser = true;
-                }
-
             case MotionEvent.ACTION_CANCEL:
 
                 if (touchId == id) {
