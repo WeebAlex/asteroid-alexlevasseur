@@ -1,0 +1,3 @@
+This is an Android Studio project; so for ease of use, 
+please use the Android Studio IDE and its built-in emulator, 
+as the making of a .exe with Android Studio is not pleasant.
